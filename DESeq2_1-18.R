@@ -13,9 +13,16 @@ library(ggrepel)
 library(RColorBrewer)
 library(pheatmap)
 
-## Load the raw count matrices, two in this case
+## Cut down to the samplkes we want to analyze
 
-counts = read.table("./data/LLG001-018_Raw_Count_Data.txt", header = T)
+data = read.table("./data/rawcountdata_LLG001-027.txt", header = T)
+data = data[,1:19]
+write.table(data,"./data/rawcountdata_LLG001-018.txt")
+rm(data)
+
+## data## Load the raw count matrices, two in this case
+
+counts = read.table("./data/rawcountdata_LLG001-018.txt", header = T)
 
 ## Load metadata (sample annotation file)
 
@@ -27,7 +34,7 @@ rownames(coldata) = coldata$ID
 strrep = sub(pattern = "\\.(.*)","",counts$X)
 counts$X = strrep
 rownames(counts) = counts$X
-counts = counts %>% select(!c(X,gene_name))
+counts = counts %>% select(!X)
 
 # Create the full model for comparison of samples
 # AK said compare DMSO to Ola day 5 and Ola day 9
