@@ -1,0 +1,153 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='396.00pt' height='216.00pt' viewBox='0 0 396.00 216.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: none;'/>
+<defs>
+  <clipPath id='cpMC4wMHwzOTYuMDB8MC4wMHwyMTYuMDA='>
+    <rect x='0.00' y='0.00' width='396.00' height='216.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHwzOTYuMDB8MC4wMHwyMTYuMDA=)'>
+</g>
+<defs>
+  <clipPath id='cpMTIwLjAwfDMxOC45MnwzOC44NXwxOTEuNzI='>
+    <rect x='120.00' y='38.85' width='198.91' height='152.87' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMTIwLjAwfDMxOC45MnwzOC44NXwxOTEuNzI=)'>
+<rect x='120.00' y='38.85' width='198.91' height='152.87' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='220.93' cy='81.23' r='8.89' style='stroke-width: 0.71; fill: #E06663;' />
+<circle cx='185.56' cy='119.07' r='8.24' style='stroke-width: 0.71; fill: #E06663;' />
+<circle cx='129.04' cy='187.18' r='7.51' style='stroke-width: 0.71; fill: #E06663;' />
+<circle cx='196.74' cy='96.37' r='6.17' style='stroke-width: 0.71; fill: #D86969;' />
+<circle cx='223.27' cy='73.66' r='6.64' style='stroke-width: 0.71; fill: #D86969;' />
+<circle cx='188.00' cy='111.50' r='5.93' style='stroke-width: 0.71; fill: #CF6B70;' />
+<circle cx='172.41' cy='141.77' r='5.08' style='stroke-width: 0.71; fill: #CE6C71;' />
+<circle cx='278.53' cy='58.53' r='7.47' style='stroke-width: 0.71; fill: #CE6C71;' />
+<circle cx='200.31' cy='88.80' r='5.97' style='stroke-width: 0.71; fill: #CC6C72;' />
+<circle cx='290.65' cy='50.96' r='7.51' style='stroke-width: 0.71; fill: #C56E78;' />
+<circle cx='167.76' cy='156.91' r='6.26' style='stroke-width: 0.71; fill: #C46E79;' />
+<circle cx='162.04' cy='164.47' r='4.91' style='stroke-width: 0.71; fill: #BC707E;' />
+<circle cx='150.21' cy='172.04' r='3.56' style='stroke-width: 0.71; fill: #B07386;' />
+<circle cx='171.19' cy='149.34' r='4.91' style='stroke-width: 0.71; fill: #A6758D;' />
+<circle cx='172.96' cy='134.20' r='4.63' style='stroke-width: 0.71; fill: #A4758E;' />
+<circle cx='223.58' cy='66.10' r='5.42' style='stroke-width: 0.71; fill: #A17590;' />
+<circle cx='309.87' cy='43.39' r='5.79' style='stroke-width: 0.71; fill: #707BA8;' />
+<circle cx='192.11' cy='103.93' r='4.26' style='stroke-width: 0.71; fill: #3F7EB8;' />
+<circle cx='144.53' cy='179.61' r='4.55' style='stroke-width: 0.71; fill: #327EBA;' />
+<circle cx='180.71' cy='126.64' r='4.37' style='stroke-width: 0.71; fill: #327EBA;' />
+<rect x='120.00' y='38.85' width='198.91' height='152.87' style='stroke-width: 1.07; stroke: #333333;' />
+</g>
+<g clip-path='url(#cpMC4wMHwzOTYuMDB8MC4wMHwyMTYuMDA=)'>
+<polyline points='120.00,191.72 120.00,38.85 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<text x='115.07' y='189.33' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='82.56px' lengthAdjust='spacingAndGlyphs'>REACTOME MRNA SPLICING</text>
+<text x='115.07' y='178.52' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='97.11px' lengthAdjust='spacingAndGlyphs'>REACTOME RRNA MODIFICATION</text>
+<text x='115.07' y='185.00' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='94.13px' lengthAdjust='spacingAndGlyphs'>IN THE NUCLEUS AND CYTOSOL</text>
+<text x='115.07' y='170.95' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='101.14px' lengthAdjust='spacingAndGlyphs'>REACTOME HDACS DEACETYLATE</text>
+<text x='115.07' y='177.43' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='30.56px' lengthAdjust='spacingAndGlyphs'>HISTONES</text>
+<text x='115.07' y='163.38' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='91.79px' lengthAdjust='spacingAndGlyphs'>REACTOME TRANSCRIPTIONAL</text>
+<text x='115.07' y='169.86' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='87.57px' lengthAdjust='spacingAndGlyphs'>REGULATION BY SMALL RNAS</text>
+<text x='115.07' y='159.06' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='93.13px' lengthAdjust='spacingAndGlyphs'>REACTOME TRNA PROCESSING</text>
+<text x='115.07' y='148.25' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='103.46px' lengthAdjust='spacingAndGlyphs'>REACTOME NEGATIVE EPIGENETIC</text>
+<text x='115.07' y='154.73' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='107.57px' lengthAdjust='spacingAndGlyphs'>REGULATION OF RRNA EXPRESSION</text>
+<text x='115.07' y='143.92' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='95.13px' lengthAdjust='spacingAndGlyphs'>REACTOME HCMV LATE EVENTS</text>
+<text x='115.07' y='133.11' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='101.23px' lengthAdjust='spacingAndGlyphs'>REACTOME POSITIVE EPIGENETIC</text>
+<text x='115.07' y='139.59' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='107.57px' lengthAdjust='spacingAndGlyphs'>REGULATION OF RRNA EXPRESSION</text>
+<text x='115.07' y='122.31' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='88.22px' lengthAdjust='spacingAndGlyphs'>REACTOME B WICH COMPLEX</text>
+<text x='115.07' y='128.79' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='90.68px' lengthAdjust='spacingAndGlyphs'>POSITIVELY REGULATES RRNA</text>
+<text x='115.07' y='135.27' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='39.02px' lengthAdjust='spacingAndGlyphs'>EXPRESSION</text>
+<text x='115.07' y='114.74' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='85.56px' lengthAdjust='spacingAndGlyphs'>REACTOME PROCESSING OF</text>
+<text x='115.07' y='121.22' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='102.23px' lengthAdjust='spacingAndGlyphs'>CAPPED INTRON CONTAINING PRE</text>
+<text x='115.07' y='127.70' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='17.67px' lengthAdjust='spacingAndGlyphs'>MRNA</text>
+<text x='115.07' y='113.65' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='95.12px' lengthAdjust='spacingAndGlyphs'>REACTOME MITOTIC PROPHASE</text>
+<text x='115.07' y='102.84' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='93.79px' lengthAdjust='spacingAndGlyphs'>REACTOME RNA POLYMERASE I</text>
+<text x='115.07' y='109.32' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='49.00px' lengthAdjust='spacingAndGlyphs'>TRANSCRIPTION</text>
+<text x='115.07' y='95.28' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='103.13px' lengthAdjust='spacingAndGlyphs'>REACTOME DNA REPLICATION PRE</text>
+<text x='115.07' y='101.76' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='30.87px' lengthAdjust='spacingAndGlyphs'>INITIATION</text>
+<text x='115.07' y='87.71' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='71.90px' lengthAdjust='spacingAndGlyphs'>REACTOME EPIGENETIC</text>
+<text x='115.07' y='94.19' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='107.90px' lengthAdjust='spacingAndGlyphs'>REGULATION OF GENE EXPRESSION</text>
+<text x='115.07' y='83.38' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='62.57px' lengthAdjust='spacingAndGlyphs'>REACTOME M PHASE</text>
+<text x='115.07' y='75.81' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='89.12px' lengthAdjust='spacingAndGlyphs'>REACTOME DNA REPLICATION</text>
+<text x='115.07' y='65.00' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='87.02px' lengthAdjust='spacingAndGlyphs'>REACTOME HATS ACETYLATE</text>
+<text x='115.07' y='71.48' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='30.56px' lengthAdjust='spacingAndGlyphs'>HISTONES</text>
+<text x='115.07' y='57.44' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='107.10px' lengthAdjust='spacingAndGlyphs'>REACTOME CHROMATIN MODIFYING</text>
+<text x='115.07' y='63.92' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='29.01px' lengthAdjust='spacingAndGlyphs'>ENZYMES</text>
+<text x='115.07' y='49.87' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='98.34px' lengthAdjust='spacingAndGlyphs'>REACTOME MITOTIC METAPHASE</text>
+<text x='115.07' y='56.35' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='46.69px' lengthAdjust='spacingAndGlyphs'>AND ANAPHASE</text>
+<text x='115.07' y='45.54' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='109.59px' lengthAdjust='spacingAndGlyphs'>REACTOME CELLULAR SENESCENCE</text>
+<polyline points='117.26,187.18 120.00,187.18 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,179.61 120.00,179.61 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,172.04 120.00,172.04 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,164.47 120.00,164.47 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,156.91 120.00,156.91 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,149.34 120.00,149.34 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,141.77 120.00,141.77 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,134.20 120.00,134.20 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,126.64 120.00,126.64 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,119.07 120.00,119.07 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,111.50 120.00,111.50 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,103.93 120.00,103.93 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,96.37 120.00,96.37 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,88.80 120.00,88.80 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,81.23 120.00,81.23 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,73.66 120.00,73.66 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,66.10 120.00,66.10 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,58.53 120.00,58.53 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,50.96 120.00,50.96 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='117.26,43.39 120.00,43.39 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='120.00,191.72 318.92,191.72 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<polyline points='154.23,194.46 154.23,191.72 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='196.70,194.46 196.70,191.72 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='239.16,194.46 239.16,191.72 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='281.63,194.46 281.63,191.72 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<text x='154.23' y='200.95' text-anchor='middle' style='font-size: 6.00px; font-family: "Arial";' textLength='10.32px' lengthAdjust='spacingAndGlyphs'>-2.1</text>
+<text x='196.70' y='200.95' text-anchor='middle' style='font-size: 6.00px; font-family: "Arial";' textLength='10.32px' lengthAdjust='spacingAndGlyphs'>-2.0</text>
+<text x='239.16' y='200.95' text-anchor='middle' style='font-size: 6.00px; font-family: "Arial";' textLength='10.32px' lengthAdjust='spacingAndGlyphs'>-1.9</text>
+<text x='281.63' y='200.95' text-anchor='middle' style='font-size: 6.00px; font-family: "Arial";' textLength='10.32px' lengthAdjust='spacingAndGlyphs'>-1.8</text>
+<text x='219.46' y='209.25' text-anchor='middle' style='font-size: 6.00px; font-family: "Arial";' textLength='12.34px' lengthAdjust='spacingAndGlyphs'>NES</text>
+<rect x='329.87' y='1.60' width='60.65' height='113.03' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='335.35' y='16.12' style='font-size: 11.00px; font-family: "Arial";' textLength='38.54px' lengthAdjust='spacingAndGlyphs'>p.adjust</text>
+<image width='17.28' height='86.40' x='335.35' y='22.76' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAAsklEQVQ4jZ1SSxJDMQiCXLUzPXdPErvoND9R027ehARBeeL1fFgDgGYgPicQaAagARwnAXm8bipTYNXzKosvgGYcZUjbYO07IWvfw0hUOAE14F+RuF6OCh92Me+kMBONfUXZjQpLim6Xu+UP2S93vPONf4/ckmxz1NJcVXzvYopM0rdWUbZdCynhvDrnzDcfUEIGwzgYUFQkR4hqGItVMsoCGfiGsNeiitIZUPoQ6OMzKG+7zqrApPYpPgAAAABJRU5ErkJggg=='/>
+<polyline points='349.18,43.81 352.63,43.81 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='349.18,64.73 352.63,64.73 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='349.18,85.64 352.63,85.64 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='349.18,106.55 352.63,106.55 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='338.81,43.81 335.35,43.81 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='338.81,64.73 335.35,64.73 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='338.81,85.64 335.35,85.64 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='338.81,106.55 335.35,106.55 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<text x='358.11' y='46.96' style='font-size: 8.80px; font-family: "Arial";' textLength='26.93px' lengthAdjust='spacingAndGlyphs'>0.0005</text>
+<text x='358.11' y='67.88' style='font-size: 8.80px; font-family: "Arial";' textLength='26.93px' lengthAdjust='spacingAndGlyphs'>0.0010</text>
+<text x='358.11' y='88.79' style='font-size: 8.80px; font-family: "Arial";' textLength='26.93px' lengthAdjust='spacingAndGlyphs'>0.0015</text>
+<text x='358.11' y='109.70' style='font-size: 8.80px; font-family: "Arial";' textLength='26.93px' lengthAdjust='spacingAndGlyphs'>0.0020</text>
+<rect x='329.87' y='125.59' width='53.38' height='103.37' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='335.35' y='140.11' style='font-size: 11.00px; font-family: "Arial";' textLength='29.36px' lengthAdjust='spacingAndGlyphs'>Count</text>
+<rect x='335.35' y='146.75' width='22.26' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='346.48' cy='155.39' r='4.91' style='stroke-width: 0.71;' />
+<rect x='335.35' y='164.03' width='22.26' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='346.48' cy='172.67' r='6.74' style='stroke-width: 0.71;' />
+<rect x='335.35' y='181.31' width='22.26' height='19.92' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='346.48' cy='191.27' r='7.85' style='stroke-width: 0.71;' />
+<rect x='335.35' y='201.23' width='22.26' height='22.26' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='346.48' cy='212.36' r='8.73' style='stroke-width: 0.71;' />
+<text x='363.09' y='158.54' style='font-size: 8.80px; font-family: "Arial";' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>50</text>
+<text x='363.09' y='175.82' style='font-size: 8.80px; font-family: "Arial";' textLength='14.69px' lengthAdjust='spacingAndGlyphs'>100</text>
+<text x='363.09' y='194.42' style='font-size: 8.80px; font-family: "Arial";' textLength='14.69px' lengthAdjust='spacingAndGlyphs'>150</text>
+<text x='363.09' y='215.51' style='font-size: 8.80px; font-family: "Arial";' textLength='14.69px' lengthAdjust='spacingAndGlyphs'>200</text>
+<text x='120.00' y='31.05' style='font-size: 11.00px; font-family: "Arial";' textLength='194.46px' lengthAdjust='spacingAndGlyphs'>GSEA Reactome Day 1 Ola 5 vs DMSO</text>
+<text x='120.00' y='14.93' style='font-size: 13.20px; font-family: "Arial";' textLength='36.66px' lengthAdjust='spacingAndGlyphs'>GSEA</text>
+</g>
+</svg>

@@ -1,0 +1,82 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' class='svglite' width='396.00pt' height='216.00pt' viewBox='0 0 396.00 216.00'>
+<defs>
+  <style type='text/css'><![CDATA[
+    .svglite line, .svglite polyline, .svglite polygon, .svglite path, .svglite rect, .svglite circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+    .svglite text {
+      white-space: pre;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: none;'/>
+<defs>
+  <clipPath id='cpMC4wMHwzOTYuMDB8MC4wMHwyMTYuMDA='>
+    <rect x='0.00' y='0.00' width='396.00' height='216.00' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHwzOTYuMDB8MC4wMHwyMTYuMDA=)'>
+</g>
+<defs>
+  <clipPath id='cpOTYuMjB8MzIzLjgxfDM4Ljg1fDE5MS43Mg=='>
+    <rect x='96.20' y='38.85' width='227.61' height='152.87' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpOTYuMjB8MzIzLjgxfDM4Ljg1fDE5MS43Mg==)'>
+<rect x='96.20' y='38.85' width='227.61' height='152.87' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='106.54' cy='163.06' r='8.89' style='stroke-width: 0.71; fill: #E06663;' />
+<circle cx='313.47' cy='67.51' r='7.90' style='stroke-width: 0.71; fill: #E06663;' />
+<circle cx='109.16' cy='115.29' r='3.56' style='stroke-width: 0.71; fill: #327EBA;' />
+<rect x='96.20' y='38.85' width='227.61' height='152.87' style='stroke-width: 1.07; stroke: #333333;' />
+</g>
+<g clip-path='url(#cpMC4wMHwzOTYuMDB8MC4wMHwyMTYuMDA=)'>
+<polyline points='96.20,191.72 96.20,38.85 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<text x='91.27' y='165.20' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='85.79px' lengthAdjust='spacingAndGlyphs'>HALLMARK MYC TARGETS V1</text>
+<text x='91.27' y='117.43' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='85.79px' lengthAdjust='spacingAndGlyphs'>HALLMARK MYC TARGETS V2</text>
+<text x='91.27' y='69.66' text-anchor='end' style='font-size: 6.00px; font-family: "Arial";' textLength='74.45px' lengthAdjust='spacingAndGlyphs'>HALLMARK P53 PATHWAY</text>
+<polyline points='93.46,163.06 96.20,163.06 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='93.46,115.29 96.20,115.29 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='93.46,67.51 96.20,67.51 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='96.20,191.72 323.81,191.72 ' style='stroke-width: 1.07; stroke-linecap: butt;' />
+<polyline points='152.47,194.46 152.47,191.72 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='211.83,194.46 211.83,191.72 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<polyline points='271.20,194.46 271.20,191.72 ' style='stroke-width: 1.07; stroke: #333333; stroke-linecap: butt;' />
+<text x='152.47' y='200.95' text-anchor='middle' style='font-size: 6.00px; font-family: "Arial";' textLength='5.33px' lengthAdjust='spacingAndGlyphs'>-1</text>
+<text x='211.83' y='200.95' text-anchor='middle' style='font-size: 6.00px; font-family: "Arial";' textLength='3.33px' lengthAdjust='spacingAndGlyphs'>0</text>
+<text x='271.20' y='200.95' text-anchor='middle' style='font-size: 6.00px; font-family: "Arial";' textLength='3.33px' lengthAdjust='spacingAndGlyphs'>1</text>
+<text x='210.01' y='209.25' text-anchor='middle' style='font-size: 6.00px; font-family: "Arial";' textLength='12.34px' lengthAdjust='spacingAndGlyphs'>NES</text>
+<rect x='334.77' y='11.84' width='55.75' height='113.03' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='340.25' y='26.36' style='font-size: 11.00px; font-family: "Arial";' textLength='38.54px' lengthAdjust='spacingAndGlyphs'>p.adjust</text>
+<image width='17.28' height='86.40' x='340.25' y='33.00' preserveAspectRatio='none' xlink:href='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAEsCAYAAAACUNnVAAAAsklEQVQ4jZ1SSxJDMQiCXLUzPXdPErvoND9R027ehARBeeL1fFgDgGYgPicQaAagARwnAXm8bipTYNXzKosvgGYcZUjbYO07IWvfw0hUOAE14F+RuF6OCh92Me+kMBONfUXZjQpLim6Xu+UP2S93vPONf4/ckmxz1NJcVXzvYopM0rdWUbZdCynhvDrnzDcfUEIGwzgYUFQkR4hqGItVMsoCGfiGsNeiitIZUPoQ6OMzKG+7zqrApPYpPgAAAABJRU5ErkJggg=='/>
+<polyline points='354.07,52.85 357.53,52.85 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='354.07,73.11 357.53,73.11 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='354.07,93.37 357.53,93.37 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='354.07,113.63 357.53,113.63 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='343.71,52.85 340.25,52.85 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='343.71,73.11 340.25,73.11 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='343.71,93.37 340.25,93.37 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<polyline points='343.71,113.63 340.25,113.63 ' style='stroke-width: 0.38; stroke: #FFFFFF; stroke-linecap: butt;' />
+<text x='363.01' y='56.00' style='font-size: 8.80px; font-family: "Arial";' textLength='22.03px' lengthAdjust='spacingAndGlyphs'>0.005</text>
+<text x='363.01' y='76.26' style='font-size: 8.80px; font-family: "Arial";' textLength='22.03px' lengthAdjust='spacingAndGlyphs'>0.010</text>
+<text x='363.01' y='96.52' style='font-size: 8.80px; font-family: "Arial";' textLength='22.03px' lengthAdjust='spacingAndGlyphs'>0.015</text>
+<text x='363.01' y='116.78' style='font-size: 8.80px; font-family: "Arial";' textLength='22.03px' lengthAdjust='spacingAndGlyphs'>0.020</text>
+<rect x='334.77' y='135.84' width='51.85' height='82.89' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<text x='340.25' y='150.35' style='font-size: 11.00px; font-family: "Arial";' textLength='29.36px' lengthAdjust='spacingAndGlyphs'>Count</text>
+<rect x='340.25' y='156.99' width='20.72' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='350.61' cy='165.63' r='5.96' style='stroke-width: 0.71;' />
+<rect x='340.25' y='174.27' width='20.72' height='18.25' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='350.61' cy='183.40' r='7.22' style='stroke-width: 0.71;' />
+<rect x='340.25' y='192.52' width='20.72' height='20.72' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
+<circle cx='350.61' cy='202.88' r='8.15' style='stroke-width: 0.71;' />
+<text x='366.45' y='168.78' style='font-size: 8.80px; font-family: "Arial";' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>60</text>
+<text x='366.45' y='186.55' style='font-size: 8.80px; font-family: "Arial";' textLength='9.79px' lengthAdjust='spacingAndGlyphs'>80</text>
+<text x='366.45' y='206.03' style='font-size: 8.80px; font-family: "Arial";' textLength='14.69px' lengthAdjust='spacingAndGlyphs'>100</text>
+<text x='96.20' y='31.05' style='font-size: 11.00px; font-family: "Arial";' textLength='187.71px' lengthAdjust='spacingAndGlyphs'>GSEA Hallmark Day 1 Ola 1 vs DMSO</text>
+<text x='96.20' y='14.93' style='font-size: 13.20px; font-family: "Arial";' textLength='36.66px' lengthAdjust='spacingAndGlyphs'>GSEA</text>
+</g>
+</svg>
