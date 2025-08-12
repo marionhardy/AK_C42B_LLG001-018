@@ -1,7 +1,7 @@
-# AK_C42B_LL001-027
+# AK_C42B_LL001-018
 ## Context
 
-RNA sequencing data set of C42B cells treated for 1 to 9 days with different doses of Olaparib.
+RNA sequencing data set of C42B cells treated for 1 to 5 days with different doses of Olaparib.
 
 ## Content
 
