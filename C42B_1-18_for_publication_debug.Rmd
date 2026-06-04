@@ -1,0 +1,1285 @@
+---
+title: "C42B cells day1 and 5, comparing Ola 1 and 5."
+author: "Marion Hardy"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    theme: spacelab
+    highlight: monochrome
+  word_document:
+    toc: true
+editor_options:
+  chunk_output_type: console
+  markdown:
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(message = FALSE, cache = T, echo = FALSE, warning = F, cache.lazy = F,
+                      always_allow_html = T)
+knitr::opts_chunk$set(fig.width=6, fig.height=7) 
+
+library(RColorBrewer)
+library(viridis)
+library(tidyverse)
+library(DESeq2)
+library(cowplot)
+library(dendextend)
+library(usedist)
+library(biomaRt)
+library(ggrepel)
+library(pheatmap)
+library(ComplexHeatmap)
+library(xlsx)
+library(msigdbr)
+library(clusterProfiler)
+library(kableExtra)
+library(gridExtra)
+library(AMR)
+library(enrichplot)
+
+ensembl_to_geneName <- readRDS("./data/hsapiens_annotations_230510.rds") %>% 
+  filter(!duplicated(gene, drop = F))
+
+dir = getwd()
+
+```
+
+# Introduction
+
+BulkRNAseq analysis of C42B cells treated with olaparib at different
+concentrations (1-5 uM?) for different amount of times (1-9 days).
+
+This report will present a broad overview of how similar/different
+samples are in terms of gene expression. The objective is to help AK
+narrow down which gene sets are of interest and follow this with a gsea
+analysis and a closer look at the function of these identified gene
+groups.
+
+Each sample comparison shown in this report will have additional files
+generated:
+
+-   res_tbl.csv = all differentially expressed genes, annotated (no
+    filtering)
+
+-   Sign_genes.xlsx = excel doc with all significantly up- and
+    down-regulated genes (log2Fc \>= 1), annotated and sorted into all
+    genes, only up and only down on different sheets.
+
+-   volcano plot of all genes (html format)
+
+NB: Data quality has been checked within the previous script "DESeq2_1-18.R",
+everything looked good.
+
+```{r}
+
+dds1 = readRDS("./data_output/C42B_DESeq_1-18_Day1_vs_DMSO.rds")
+dds5 = readRDS("./data_output/C42B_DESeq_1-18_Day5_vs_DMSO.rds")
+
+```
+
+
+```{r}
+
+# MsigDb
+
+hsa_GOBP_sets = msigdbr(
+  species = "Homo sapiens", 
+  category = "C5",
+  subcategory = "GO:BP")
+
+hsa_hallmark_sets = msigdbr(
+  species = "Homo sapiens", 
+  category = "H")
+
+hsa_reactome_sets = msigdbr(
+  species = "Homo sapiens", 
+  category = "C2",
+  subcategory = "CP:REACTOME") # for reactome collection
+
+set.seed(054057) # for reproducibility
+
+```
+
+# PCA
+
+```{r, fig.height=5, fig.width=6}
+rld = vst(dds1)
+
+plotPCA(rld,intgroup="Combined") + 
+  geom_text_repel(aes(label = Combined, size = 8), 
+                  colour = 'black',max.overlaps = Inf, box.padding = 0.6)+
+  xlim(c(-20,40))+
+  ylim(c(-17, 17))+
+  theme_bw()+
+  labs(title = 'PCA per treatment and group')
+
+ggsave(plot = last_plot(),"./figures/for_pub/PCA1.svg", dpi = 300,
+       height = 6, width = 7.5)
+
+```
+
+# Extract the weights per genes
+
+```{r, fig.height=5, fig.width=6, echo=FALSE}
+
+data = assay(dds1)
+forlabel = as.data.frame(rownames(data))
+colnames(forlabel) = "ensembl"
+forlabel = left_join(forlabel, ensembl_to_geneName)
+rownames(data) = forlabel$gene
+
+pca = prcomp(data)
+loadings = as.data.frame(pca$x)
+loadings$gene = rownames(loadings)
+
+top_genes = loadings %>% 
+  select(gene, PC1, PC2) %>%
+  pivot_longer(matches("PC"), names_to = "PC", values_to = "loading") %>% 
+  group_by(PC) %>% 
+  arrange(desc(abs(loading))) %>% 
+  slice(1:20) %>% # take the 20 top rows
+  pull(gene) %>% 
+  unique()
+
+
+```
+
+```{r, fig.height=5, fig.width=6, echo=FALSE}
+
+# plot the biplot
+
+loadings %>% 
+  filter(gene %in% top_genes) %>% 
+  ggplot() +
+  geom_segment(aes(x = 0, y = 0, xend = PC1, yend = PC2), 
+               arrow = arrow(length = unit(0.1, "in")),
+               color = "firebrick3") +
+  geom_text(aes(x = PC1, y = PC2, label = gene),
+            nudge_y = 10000, nudge_x = -50000,
+            size = 3)+
+  theme_bw()+
+  xlab("PC1 loadings")+
+  ylab("PC2 loadings")+
+  labs(title = 'Biplot of gene loadings')
+
+ggsave(plot = last_plot(),"./figures/for_pub/PCA1_weights.svg", dpi = 300,
+       height = 4.5, width = 5.5)
+
+
+```
+
+# Euclidian distances
+
+```{r, fig.height=5, fig.width=6}
+sampleDists = dist(t(assay(rld)))
+sampleDistMatrix = as.matrix(sampleDists)
+rownames(sampleDistMatrix) = paste(rld$Combined, sep="-")
+colnames(sampleDistMatrix) = paste(rld$Combined, sep="-")
+colors = colorRampPalette(rev(brewer.pal(9, "Blues")) )(500)
+colors = viridis(20)
+# colors = colorRampPalette(rev(brewer.pal(7, "YlGnBu")) )(4)
+
+pheatmap(sampleDistMatrix,
+         clustering_distance_rows=sampleDists,
+         clustering_distance_cols=sampleDists,
+         col=colors)
+# figure exported as svg manually
+```
+
+# Dendogram
+
+```{r, fig.height=4, fig.width=7}
+
+sampleDists_named = sampleDists
+sampleDists_named = dist_setNames(sampleDists_named, as.vector(colData(dds1)[,8]))
+
+hc = hclust(sampleDists_named)
+hc %>% 
+  as.dendrogram() %>% 
+  set("labels_col", c(1,2,4),k=3) %>% 
+  plot()
+# figure exported as svg manually
+
+```
+
+
+# Day1 Ola 1 and 5 vs DMSO
+
+## Volcano plots
+
+```{r, fig.show="hold", out.width="50%"}
+
+for (i in 2:3){
+    cond = resultsNames(dds1)[i]
+    name = gsub("Treatment_","",resultsNames(dds1)[i])
+    
+    res <- results(dds1, name = cond)
+    res_tbl <- as_tibble(res, rownames="ensembl")
+    res_tbl <- res_tbl %>%
+    left_join(ensembl_to_geneName) %>%
+    arrange(padj) 
+    dir.create(paste0(dir,'/data_output/',name))
+    dir.create(paste0(dir,'/figures/',name))
+    write.csv(res_tbl, paste0("./data_output/",name,"/res_tbl.csv"), row.names = T)
+    
+    overexpr <- res_tbl %>% filter(padj<=0.05 & log2FoldChange>=0.5) 
+    underexpr <- res_tbl %>% filter(padj<=0.05 & log2FoldChange<=-0.5)
+    signif <- full_join(overexpr, underexpr)
+  
+    write.xlsx(overexpr, file= paste0("./data_output/",name,"/Sign_genes.xlsx"), sheetName="UP")
+    write.xlsx(underexpr, file=paste0("./data_output/",name,"/Sign_genes.xlsx"), sheetName="DOWN", append=TRUE)
+    write.xlsx(signif, file=paste0("./data_output/",name,"/Sign_genes.xlsx"), sheetName="SIGNIF", append=TRUE)
+    
+    top15 = 
+      signif %>% 
+      arrange(desc(abs(log2FoldChange))) %>% 
+      filter(!is.na(gene))
+    
+    top15 = top15$gene[1:15]
+    
+    res_tbl <- res_tbl %>%
+    filter(!is.na(padj)) %>%
+    mutate(label_gene = ifelse(gene %in% top15, gene, NA))
+
+    p1 =
+  res_tbl %>%
+    filter(!is.na(padj)) %>%
+    ggplot(aes(x = log2FoldChange, y = -log10(padj),
+               color = padj < 0.05 & abs(log2FoldChange) > 0.5, 
+               label = label_gene)) +
+    scale_colour_manual(values = c("gray", "firebrick3")) +
+    labs(col="Significantly expressed")+
+    geom_point(size = 0.5) +
+    geom_hline(yintercept = -log10(0.05)) +
+    geom_vline(xintercept = 0.5) +
+    geom_vline(xintercept = -0.5)+
+    geom_text_repel(max.overlaps = 30,
+                    box.padding = 0.25,
+                    segment.color = 'grey50',
+                    fontface = "italic")+
+    labs(title = name)+
+    theme_bw()
+  
+  print(p1)
+  
+    ggsave(paste0("./figures/",name,"/volcanoplot.svg"), last_plot(), 
+           dpi= 500, width = 8, height =4 )
+    rm(top15)
+
+}
+
+```
+
+
+
+```{r, echo=FALSE}
+
+res_tbl = read.csv("./data_output/Combined_Day1_Ola1_vs_Day1_DMSO/res_tbl.csv")
+
+top15 = 
+  res_tbl %>% 
+  arrange(desc(abs(log2FoldChange))) %>% 
+  filter(!is.na(gene)&padj<0.05)
+    
+top15 = top15$gene[1:15]
+
+res_tbl <- res_tbl %>%
+  filter(!is.na(padj)&padj<0.05) %>%
+  mutate(label_gene = ifelse(gene %in% top15, gene, NA))
+
+
+res_tbl %>%
+    filter(!is.na(padj)) %>%
+    ggplot(aes(x = log2FoldChange, y = -log10(padj),
+               color = padj < 0.05 & abs(log2FoldChange) > 0.5, 
+               label = label_gene)) +
+    scale_colour_manual(values = c("gray", "firebrick3")) +
+    labs(col="Significantly expressed")+
+    geom_point(size = 0.5) +
+    geom_hline(yintercept = -log10(0.05)) +
+    geom_vline(xintercept = 0.5) +
+    geom_vline(xintercept = -0.5)+
+    geom_text_repel(max.overlaps = 100,
+                    box.padding = 1.5,
+                    segment.color = 'grey50',
+                    fontface = "italic",
+                    size = 2)+
+    labs(title = "Ola1 day1 vs DMSO")+
+  scale_x_continuous(limits = c(-15,25))+
+    theme_bw()+ 
+  theme(legend.position="none")
+  
+
+ggsave("./figures/for_pub/Ola1_Day1_volcanoplot.svg", last_plot(), 
+           dpi= 300, width = 4, height = 3, units = "in")
+
+
+
+## Ola 5
+
+res_tbl = read.csv("./data_output/Combined_Day1_Ola5_vs_Day1_DMSO/res_tbl.csv")
+
+top15 = 
+  res_tbl %>% 
+  arrange(desc(abs(log2FoldChange))) %>% 
+  filter(!is.na(gene)&padj<0.05)
+    
+top15 = top15$gene[1:15]
+
+res_tbl <- res_tbl %>%
+  filter(!is.na(padj)&padj<0.05) %>%
+  mutate(label_gene = ifelse(gene %in% top15, gene, NA))
+
+res_tbl %>%
+    filter(!is.na(padj)) %>%
+    ggplot(aes(x = log2FoldChange, y = -log10(padj),
+               color = padj < 0.05 & abs(log2FoldChange) > 0.5, 
+               label = label_gene)) +
+    scale_colour_manual(values = c("gray", "firebrick3")) +
+    labs(col="Significantly expressed")+
+    geom_point(size = 0.5) +
+    geom_hline(yintercept = -log10(0.05)) +
+    geom_vline(xintercept = 0.5) +
+    geom_vline(xintercept = -0.5)+
+    geom_text_repel(max.overlaps = 100,
+                    box.padding = 1.5,
+                    segment.color = 'grey50',
+                    fontface = "italic",
+                    size = 2)+
+    labs(title = "Ola5 day1 vs DMSO")+
+  scale_x_continuous(limits = c(-25,25))+
+    theme_bw()+ 
+  theme(legend.position="none")
+  
+
+ 
+ggsave("./figures/for_pub/Ola5_Day1_volcanoplot.svg", last_plot(), 
+           dpi= 300, width = 4, height = 3, units = "in")
+
+
+```
+
+
+## GSEA Day1 Ola1
+### GOBP
+
+```{r, fig.height=5, fig.width=7}
+
+res_tbl = read.csv(paste0("./data_output/Combined_Day1_Ola1_vs_Day1_DMSO/res_tbl.csv"))
+    
+ordered_genes_fc = res_tbl$log2FoldChange
+names(ordered_genes_fc) = res_tbl$gene
+ordered_genes_fc = sort(ordered_genes_fc, decreasing = T)
+
+gsea_results = GSEA(
+  geneList = ordered_genes_fc, 
+  pvalueCutoff = 0.05, 
+  eps = 0, 
+  pAdjustMethod = "BH", 
+  nPermSimple = 10000,
+  TERM2GENE = dplyr::select(
+    hsa_GOBP_sets,
+    gs_name,
+     gene_symbol
+  )
+)
+
+dotplot(gsea_results, x = "NES", showCategory = 20, font.size = 8)+ 
+  labs(title = "GSEA",
+          subtitle = paste0("GSEA GO:BP Day 1 Ola 1 vs DMSO"))+
+  theme(axis.line = element_line(color='black'),
+  plot.background = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank())
+
+ggsave(plot = last_plot(), paste0("./figures/Combined_Day1_Ola1_vs_Day1_DMSO/GOBPgsea.svg"), dpi = 300,
+      height = 8, width = 8, device = "svg")
+
+
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola1_day1_GOBPgsea.svg"), dpi = 300,
+      height = 3.5, width = 6, device = "svg")
+
+write.xlsx(gsea_results, paste0("./data_output/Combined_Day1_Ola1_vs_Day1_DMSO/GOBPgsea.xlsx"))
+
+gsea_results %>%
+  as_tibble() %>%
+  arrange(desc(NES)) %>% 
+  select(ID, NES, setSize,	p.adjust,	qvalue, core_enrichment) %>%
+  knitr::kable()%>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>% 
+  scroll_box(width = "1000px", height = "500px")
+```
+
+### Reactome
+
+no results
+
+### Hallmark
+
+```{r, fig.height=5, fig.width=7}
+
+gsea_results = GSEA(
+  geneList = ordered_genes_fc, 
+  pvalueCutoff = 0.05, 
+  eps = 0, 
+  pAdjustMethod = "BH", 
+  nPermSimple = 10000,
+  TERM2GENE = dplyr::select(
+    hsa_hallmark_sets,
+    gs_name,
+     gene_symbol
+  )
+)
+
+dotplot(gsea_results, x = "NES", showCategory = 20, font.size = 8)+ 
+  labs(title = "GSEA",
+          subtitle = paste0("GSEA Hallmark Day 1 Ola 1 vs DMSO"))+
+  theme(axis.line = element_line(color='black'),
+  plot.background = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank())
+
+ggsave(plot = last_plot(), paste0("./figures/Combined_Day1_Ola1_vs_Day1_DMSO/Hallmarkgsea.svg"), dpi = 300,
+      height = 8, width = 8, device = "svg")
+
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola1_day1_Hallmarkgsea.svg"), dpi = 300,
+      height = 2.5, width = 5, device = "svg")
+
+write.xlsx(gsea_results, paste0("./data_output/Combined_Day1_Ola1_vs_Day1_DMSO/Hallmarkgsea.xlsx"))
+
+gsea_results %>%
+  as_tibble() %>%
+  arrange(desc(NES)) %>% 
+  select(ID, NES, setSize,	p.adjust,	qvalue, core_enrichment) %>%
+  knitr::kable()%>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>% 
+  scroll_box(width = "1000px", height = "500px")
+```
+
+### GSEA plot 
+
+```{r}
+
+# hallmark p53 pathway
+
+gseaplot2(gsea_results, geneSetID = 2, title = gsea_results$Description[2])
+
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola1_day1_gseaplot_p53.svg"), dpi = 300,
+      height = 2.5, width = 4, device = "svg")
+
+```
+
+
+## GSEA Day1 Ola5
+### GOBP
+
+```{r}
+
+res_tbl = read.csv(paste0("./data_output/Combined_Day1_Ola5_vs_Day1_DMSO/res_tbl.csv"))
+    
+ordered_genes_fc = res_tbl$log2FoldChange
+names(ordered_genes_fc) = res_tbl$gene
+ordered_genes_fc = sort(ordered_genes_fc, decreasing = T)
+
+gsea_results = GSEA(
+  geneList = ordered_genes_fc, 
+  pvalueCutoff = 0.05, 
+  eps = 0, 
+  pAdjustMethod = "BH", 
+  nPermSimple = 10000,
+  TERM2GENE = dplyr::select(
+    hsa_GOBP_sets,
+    gs_name,
+     gene_symbol
+  )
+)
+
+dotplot(gsea_results, x = "NES", showCategory = 20, font.size = 8)+ 
+  labs(title = "GSEA",
+          subtitle = paste0("GSEA GO:BP Day 1 Ola 5 vs DMSO"))+
+  theme(axis.line = element_line(color='black'),
+  plot.background = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank())
+
+ggsave(plot = last_plot(), paste0("./figures/Combined_Day1_Ola5_vs_Day1_DMSO/GOBPgsea.svg"), dpi = 300,
+      height = 8, width = 8, device = "svg")
+
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola5_day1_GOBPgsea.svg"), dpi = 300,
+      height = 5, width = 5.5, device = "svg")
+
+write.xlsx(gsea_results, paste0("./data_output/Combined_Day1_Ola5_vs_Day1_DMSO/GOBPgsea.xlsx"))
+
+gsea_results %>%
+  as_tibble() %>%
+  arrange(desc(NES)) %>% 
+  select(ID, NES, setSize,	p.adjust,	qvalue, core_enrichment) %>%
+  knitr::kable()%>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>% 
+  scroll_box(width = "1000px", height = "500px")
+```
+
+### Reactome
+
+```{r}
+
+res_tbl = read.csv("./data_output/Combined_Day1_Ola5_vs_Day1_DMSO/res_tbl.csv")
+    
+ordered_genes_fc = res_tbl$log2FoldChange
+names(ordered_genes_fc) = res_tbl$gene
+ordered_genes_fc = sort(ordered_genes_fc, decreasing = T)
+
+gsea_results = GSEA(
+  geneList = ordered_genes_fc, 
+  pvalueCutoff = 0.05, 
+  eps = 0, 
+  pAdjustMethod = "BH", 
+  nPermSimple = 10000,
+  TERM2GENE = dplyr::select(
+    hsa_reactome_sets,
+    gs_name,
+     gene_symbol
+  )
+)
+
+dotplot(gsea_results, x = "NES", showCategory = 20, font.size = 8)+ 
+  labs(title = "GSEA",
+          subtitle = paste0("GSEA Reactome Day 1 Ola 5 vs DMSO"))+
+  theme(axis.line = element_line(color='black'),
+  plot.background = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank())
+
+ggsave(plot = last_plot(), paste0("./figures/Combined_Day1_Ola5_vs_Day1_DMSO/Reactomegsea.svg"), dpi = 300,
+      height = 8, width = 8, device = "svg")
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola5_day1_Reactomegsea.svg"), dpi = 300,
+      height = 6, width = 5.5, device = "svg")
+
+write.xlsx(gsea_results, paste0("./data_output/Combined_Day1_Ola5_vs_Day1_DMSO/Reactomegsea.xlsx"))
+
+gsea_results %>%
+  as_tibble() %>%
+  arrange(desc(NES)) %>% 
+  select(ID, NES, setSize,	p.adjust,	qvalue, core_enrichment) %>%
+  knitr::kable()%>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>% 
+  scroll_box(width = "1000px", height = "500px")
+```
+
+### Hallmark
+
+```{r, fig.height=5, fig.width=7}
+
+gsea_results = GSEA(
+  geneList = ordered_genes_fc, 
+  pvalueCutoff = 0.05, 
+  eps = 0, 
+  pAdjustMethod = "BH", 
+  nPermSimple = 10000,
+  TERM2GENE = dplyr::select(
+    hsa_hallmark_sets,
+    gs_name,
+     gene_symbol
+  )
+)
+
+dotplot(gsea_results, x = "NES", showCategory = 20, font.size = 8)+ 
+  labs(title = "GSEA",
+          subtitle = paste0("GSEA Hallmark Day 1 Ola 5 vs DMSO"))+
+  theme(axis.line = element_line(color='black'),
+  plot.background = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank())
+
+ggsave(plot = last_plot(), paste0("./figures/Combined_Day1_Ola5_vs_Day1_DMSO/Hallmarkgsea.svg"), dpi = 300,
+      height = 8, width = 8, device = "svg")
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola5_day1_Hallmarkgsea.svg"), dpi = 300,
+      height = 3, width = 5.5, device = "svg")
+
+write.xlsx(gsea_results, paste0("./data_output/Combined_Day1_Ola5_vs_Day1_DMSO/Hallmarkgsea.xlsx"))
+
+gsea_results %>%
+  as_tibble() %>%
+  arrange(desc(NES)) %>% 
+  select(ID, NES, setSize,	p.adjust,	qvalue, core_enrichment) %>%
+  knitr::kable()%>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>% 
+  scroll_box(width = "1000px", height = "500px")
+```
+
+### GSEA plot 
+
+```{r}
+
+# hallmark p53 pathway
+
+gseaplot2(gsea_results, geneSetID = 3, title = gsea_results$Description[3])
+
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola5_day1_gseaplot_p53.svg"), dpi = 300,
+      height = 2.5, width = 4, device = "svg")
+
+```
+
+### Summary
+
+```{r}
+
+# shared with ola 1 are
+# GOBP_NCRNA_PROCESSING GOBP_RIBOSOME_BIOGENESIS
+# HALLMARK_P53_PATHWAY HALLMARK_MYC_TARGETS_V1
+
+# pool terms of interest
+hsa_summary = 
+  hsa_GOBP_sets %>% 
+  filter(gs_name %in% toupper(c("gobp_ribosome_biogenesis",
+                        "gobp_ncrna_processing","GOBP_RRNA_METABOLIC_PROCESS",
+                        "GOBP_TRNA_METABOLIC_PROCESS", "GOBP_RIBONUCLEOPROTEIN_COMPLEX_BIOGENESIS",
+                        "GOBP_CHROMATIN_ASSEMBLY_OR_DISASSEMBLY	"))) %>% 
+  rbind(hsa_reactome_sets %>% filter(
+    gs_name%in% toupper(c("REACTOME_CELL_CYCLE_CHECKPOINTS",
+                          "REACTOME_G2_M_CHECKPOINTS",
+                          "REACTOME_TRANSLATION",
+                          "REACTOME_CHROMOSOME_MAINTENANCE",
+                          "REACTOME_ESTROGEN_DEPENDENT_GENE_EXPRESSION",
+                          "REACTOME_SENESCENCE_ASSOCIATED_SECRETORY_PHENOTYPE_SASP",
+                          "REACTOME_HDACS_DEACETYLATE_HISTONES")))) %>% 
+  rbind(hsa_hallmark_sets %>%  filter(gs_name %in% toupper(c("hallmark_p53_pathway",
+                                                            "hallmark_myc_targets_v1",
+                                                            "HALLMARK_E2F_TARGETS"))))
+
+# load results for each conditions
+res_tbl_ola1 = read.csv("./data_output/Combined_Day1_Ola1_vs_Day1_DMSO/res_tbl.csv")
+res_tbl_ola5 = read.csv("./data_output/Combined_Day1_Ola5_vs_Day1_DMSO/res_tbl.csv")
+
+
+ordered_genes_fc1 <- res_tbl_ola1$log2FoldChange
+names(ordered_genes_fc1) <- res_tbl_ola1$gene
+ordered_genes_fc1 <- sort(ordered_genes_fc1, decreasing = T)
+table(is.na(ordered_genes_fc1))
+
+ordered_genes_fc2 <- res_tbl_ola5$log2FoldChange
+names(ordered_genes_fc2) <- res_tbl_ola5$gene
+ordered_genes_fc2 <- sort(ordered_genes_fc2, decreasing = T)
+
+gcSample = list(Ola_1 = ordered_genes_fc1, 
+                Ola_5 = ordered_genes_fc2)
+
+# compare
+
+ck = compareCluster(gcSample, fun = GSEA, TERM2GENE = dplyr::select(
+    hsa_summary,
+    gs_name,
+    gene_symbol))
+
+# plot
+
+dotplot(ck, showCategory = 20, font.size = 7, x = "NES", by = "Count")+
+ theme(strip.background = element_rect(
+     color="black", fill = 'grey95',size=.5, linetype="solid"))+
+  facet_grid(.~Cluster)+
+  scale_colour_gradient2(limits=c(0, 0.05), low="red", high = "blue", 
+                         mid = "grey", midpoint = 0.015)+
+  theme(axis.line = element_line(color='black'),
+  plot.background = element_blank())+
+  labs(title = "Day 1 GSEA",
+              subtitle = "Ola 1 and Ola 5 compared to DMSO")
+
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Summary_day1_gsea.svg"), dpi = 300,
+      height = 5, width = 8, device = "svg")
+
+```
+
+
+# Day 5 Ola 1 and 5 vs DMSO
+
+## Volcano plots
+
+```{r, fig.show="hold", out.width="50%"}
+
+for (i in c(5:6)){
+    cond = resultsNames(dds5)[i]
+    name = gsub("Treatment_","",resultsNames(dds5)[i])
+    
+    res <- results(dds5, name = cond)
+    res_tbl <- as_tibble(res, rownames="ensembl")
+    res_tbl <- res_tbl %>%
+    left_join(ensembl_to_geneName) %>%
+    arrange(padj) 
+    dir.create(paste0(dir,'/data_output/',name))
+    dir.create(paste0(dir,'/figures/',name))
+    write.csv(res_tbl, paste0("./data_output/",name,"/res_tbl.csv"), row.names = T)
+    overexpr <- res_tbl %>% filter(padj<=0.05 & log2FoldChange>=0.5) 
+    underexpr <- res_tbl %>% filter(padj<=0.05 & log2FoldChange<=-0.5)
+    signif <- full_join(overexpr, underexpr)
+  
+    write.xlsx(overexpr, file= paste0("./data_output/",name,"/Sign_genes.xlsx"), sheetName="UP")
+    write.xlsx(underexpr, file=paste0("./data_output/",name,"/Sign_genes.xlsx"), sheetName="DOWN", append=TRUE)
+    write.xlsx(signif, file=paste0("./data_output/",name,"/Sign_genes.xlsx"), sheetName="SIGNIF", append=TRUE)
+    
+    p1 =
+  res_tbl %>%
+    filter(!is.na(padj)) %>%
+    ggplot(aes(x = log2FoldChange, y = -log10(padj),
+               color = padj < 0.05 & abs(log2FoldChange) > 1, 
+               label = ifelse(padj<0.05&log2FoldChange>=1|
+                                padj<0.05&log2FoldChange<=-1,as.character(gene),''))) +
+    scale_colour_manual(values = c("gray", "firebrick3")) +
+    labs(col="Significantly expressed")+
+    geom_point(size = 0.5) +
+    geom_hline(yintercept = -log10(0.05)) +
+    geom_vline(xintercept = 1) +
+    geom_vline(xintercept = -1)+
+    geom_text_repel(max.overlaps = 15,
+                    box.padding = 0.25,
+                    segment.color = 'grey50',
+                    fontface = "italic")+
+    labs(title = name)+
+    theme_bw()
+  
+  print(p1)
+  
+    ggsave(paste0("./figures/",name,"/volcanoplot.svg"), last_plot(), 
+           dpi= 300, width = 12, height = 8)
+  
+    
+}
+
+
+```
+
+```{r, echo=FALSE}
+
+res_tbl = read.csv("./data_output/Combined_Day5_Ola1_vs_Day5_DMSO/res_tbl.csv")
+
+top15 = 
+  res_tbl %>% 
+  arrange(desc(abs(log2FoldChange))) %>% 
+  filter(!is.na(gene)&padj<0.05)
+    
+top15 = top15$gene[1:15]
+
+res_tbl <- res_tbl %>%
+  filter(!is.na(padj)&padj<0.05) %>%
+  mutate(label_gene = ifelse(gene %in% top15, gene, NA))
+
+
+res_tbl %>%
+    filter(!is.na(padj)) %>%
+    ggplot(aes(x = log2FoldChange, y = -log10(padj),
+               color = padj < 0.05 & abs(log2FoldChange) > 0.5, 
+               label = label_gene) ) +
+    scale_colour_manual(values = c("gray", "firebrick3")) +
+    labs(col="Significantly expressed")+
+    geom_point(size = 0.5) +
+    geom_hline(yintercept = -log10(0.05)) +
+    geom_vline(xintercept = 0.5) +
+    geom_vline(xintercept = -0.5)+
+    geom_text_repel(max.overlaps = 50,
+                    box.padding = 1.5,
+                    segment.color = 'grey50',
+                    fontface = "italic",
+                    size = 2)+
+    labs(title = "Ola1 day5 vs DMSO")+
+  scale_x_continuous(limits = c(-15,25))+
+    theme_bw()+ 
+  theme(legend.position="none")
+  
+
+ 
+ggsave("./figures/for_pub/Ola1_Day5_volcanoplot.svg", last_plot(), 
+           dpi= 300, width = 4, height = 3, units = "in")
+
+
+## Ola 5
+
+res_tbl = read.csv("./data_output/Combined_Day5_Ola5_vs_Day5_DMSO/res_tbl.csv")
+
+top15 = 
+  res_tbl %>% 
+  arrange(desc(abs(log2FoldChange))) %>% 
+  filter(!is.na(gene)&padj<0.05)
+    
+top15 = top15$gene[1:15]
+
+res_tbl <- res_tbl %>%
+  filter(!is.na(padj)&padj<0.05) %>%
+  mutate(label_gene = ifelse(gene %in% top15, gene, NA))
+
+
+res_tbl %>%
+    filter(!is.na(padj)) %>%
+    ggplot(aes(x = log2FoldChange, y = -log10(padj),
+               color = padj < 0.05 & abs(log2FoldChange) > 0.5, 
+               label = label_gene) ) +
+    scale_colour_manual(values = c("gray", "firebrick3")) +
+    labs(col="Significantly expressed")+
+    geom_point(size = 0.5) +
+    geom_hline(yintercept = -log10(0.05)) +
+    geom_vline(xintercept = 0.5) +
+    geom_vline(xintercept = -0.5)+
+    geom_text_repel(max.overlaps = 50,
+                    box.padding = 1.5,
+                    segment.color = 'grey50',
+                    fontface = "italic",
+                    size = 2)+
+    labs(title = "Ola5 day5 vs DMSO")+
+  scale_x_continuous(limits = c(-15,25))+
+    theme_bw()+ 
+  theme(legend.position="none")
+  
+
+ 
+ggsave("./figures/for_pub/Ola5_Day5_volcanoplot.svg", last_plot(), 
+           dpi= 300, width = 4, height = 3, units = "in")
+
+
+```
+
+
+## GSEA Day5 Ola1
+### GOBP
+
+```{r}
+
+res_tbl = read.csv(paste0("./data_output/Combined_Day5_Ola1_vs_Day5_DMSO/res_tbl.csv"))
+    
+ordered_genes_fc = res_tbl$log2FoldChange
+names(ordered_genes_fc) = res_tbl$gene
+ordered_genes_fc = sort(ordered_genes_fc, decreasing = T)
+
+gsea_results = GSEA(
+  geneList = ordered_genes_fc, 
+  pvalueCutoff = 0.05, 
+  eps = 0, 
+  pAdjustMethod = "BH", 
+  nPermSimple = 10000,
+  TERM2GENE = dplyr::select(
+    hsa_GOBP_sets,
+    gs_name,
+     gene_symbol
+  )
+)
+
+dotplot(gsea_results, x = "NES", showCategory = 20, font.size = 6)+ 
+  labs(title = "GSEA",
+          subtitle = paste0("GSEA GO:BP Day 5 Ola 1 vs DMSO"))+
+  theme(axis.line = element_line(color='black'),
+  plot.background = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank())
+
+ggsave(plot = last_plot(), paste0("./figures/Combined_Day5_Ola1_vs_Day5_DMSO/GOBPgsea.svg"), dpi = 300,
+      height = 8, width = 8, device = "svg")
+
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola1_day5_GOBPgsea.svg"), dpi = 300,
+      height = 5, width = 4.5, device = "svg")
+
+write.xlsx(gsea_results, paste0("./data_output/Combined_Day5_Ola1_vs_Day5_DMSO/GOBPgsea.xlsx"))
+
+gsea_results %>%
+  as_tibble() %>%
+  arrange(desc(NES)) %>% 
+  select(ID, NES, setSize,	p.adjust,	qvalue, core_enrichment) %>%
+  knitr::kable()%>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>% 
+  scroll_box(width = "1000px", height = "500px")
+```
+
+
+### Reactome
+
+```{r}
+
+res_tbl = read.csv(paste0("./data_output/Combined_Day5_Ola1_vs_Day5_DMSO/res_tbl.csv"))
+    
+ordered_genes_fc = res_tbl$log2FoldChange
+names(ordered_genes_fc) = res_tbl$gene
+ordered_genes_fc = sort(ordered_genes_fc, decreasing = T)
+
+gsea_results = GSEA(
+  geneList = ordered_genes_fc, 
+  pvalueCutoff = 0.05, 
+  eps = 0, 
+  pAdjustMethod = "BH", 
+  nPermSimple = 10000,
+  TERM2GENE = dplyr::select(
+    hsa_reactome_sets,
+    gs_name,
+     gene_symbol
+  )
+)
+
+dotplot(gsea_results, x = "NES", showCategory = 20, font.size = 8)+ 
+  labs(title = "GSEA",
+          subtitle = paste0("GSEA Reactome Day 5 Ola 1 vs DMSO"))+
+  theme(axis.line = element_line(color='black'),
+  plot.background = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank())
+
+ggsave(plot = last_plot(), paste0("./figures/Combined_Day5_Ola1_vs_Day5_DMSO/Reactomegsea.svg"), dpi = 300,
+      height = 8, width = 8, device = "svg")
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola1_day5_Reactomegsea.svg"), dpi = 300,
+      height = 5, width = 5, device = "svg")
+
+write.xlsx(gsea_results, paste0("./data_output/Combined_Day5_Ola1_vs_Day5_DMSO/Reactomegsea.xlsx"))
+
+gsea_results %>%
+  as_tibble() %>%
+  arrange(desc(NES)) %>% 
+  select(ID, NES, setSize,	p.adjust,	qvalue, core_enrichment) %>%
+  knitr::kable()%>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>% 
+  scroll_box(width = "1000px", height = "500px")
+```
+
+
+### GSEA plot 
+
+```{r}
+
+# fatty acid
+
+gseaplot2(gsea_results, geneSetID = 21, title = gsea_results$Description[21])
+
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola1_day5_gseaplot_fattyacid.svg"), dpi = 300,
+      height = 2.5, width = 4, device = "svg")
+
+```
+
+
+### Hallmark
+
+```{r, fig.height=5, fig.width=7}
+
+gsea_results = GSEA(
+  geneList = ordered_genes_fc, 
+  pvalueCutoff = 0.05, 
+  eps = 0, 
+  pAdjustMethod = "BH", 
+  nPermSimple = 10000,
+  TERM2GENE = dplyr::select(
+    hsa_hallmark_sets,
+    gs_name,
+     gene_symbol
+  )
+)
+
+dotplot(gsea_results, x = "NES", showCategory = 20, font.size = 8)+ 
+  labs(title = "GSEA",
+          subtitle = paste0("GSEA Hallmark Day 5 Ola 1 vs DMSO"))+
+  theme(axis.line = element_line(color='black'),
+  plot.background = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank())
+
+ggsave(plot = last_plot(), paste0("./figures/Combined_Day5_Ola1_vs_Day5_DMSO/Hallmarkgsea.svg"), dpi = 300,
+      height = 8, width = 8, device = "svg")
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola1_day5_Hallmarkgsea.svg"), dpi = 300,
+      height = 5, width = 5.5, device = "svg")
+
+write.xlsx(gsea_results, paste0("./data_output/Combined_Day5_Ola1_vs_Day5_DMSO/Hallmarkgsea.xlsx"))
+
+gsea_results %>%
+  as_tibble() %>%
+  arrange(desc(NES)) %>% 
+  select(ID, NES, setSize,	p.adjust,	qvalue, core_enrichment) %>%
+  knitr::kable()%>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>% 
+  scroll_box(width = "1000px", height = "500px")
+
+```
+
+### GSEA plot 
+
+```{r}
+
+# hallmark emt pathway
+
+gseaplot2(gsea_results, geneSetID = 12, title = gsea_results$Description[12])
+
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola1_day5_gseaplot_emt.svg"), dpi = 300,
+      height = 2.5, width = 4, device = "svg")
+
+```
+
+## GSEA Day5 Ola5
+### GOBP
+
+```{r}
+
+res_tbl = read.csv(paste0("./data_output/Combined_Day5_Ola5_vs_Day5_DMSO/res_tbl.csv"))
+    
+ordered_genes_fc = res_tbl$log2FoldChange
+names(ordered_genes_fc) = res_tbl$gene
+ordered_genes_fc = sort(ordered_genes_fc, decreasing = T)
+
+gsea_results = GSEA(
+  geneList = ordered_genes_fc, 
+  pvalueCutoff = 0.05, 
+  eps = 0, 
+  pAdjustMethod = "BH", 
+  nPermSimple = 10000,
+  TERM2GENE = dplyr::select(
+    hsa_GOBP_sets,
+    gs_name,
+     gene_symbol
+  )
+)
+
+dotplot(gsea_results, x = "NES", showCategory = 20, font.size = 8)+ 
+  labs(title = "GSEA",
+          subtitle = paste0("GSEA GO:BP Day 5 Ola 5 vs DMSO"))+
+  theme(axis.line = element_line(color='black'),
+  plot.background = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank())
+
+ggsave(plot = last_plot(), paste0("./figures/Combined_Day5_Ola5_vs_Day5_DMSO/GOBPgsea.svg"), dpi = 300,
+      height = 8, width = 8, device = "svg")
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola5_day5_GOBPgsea.svg"), dpi = 300,
+      height = 5, width = 5.5, device = "svg")
+
+write.xlsx(gsea_results, paste0("./data_output/Combined_Day5_Ola5_vs_Day5_DMSO/GOBPgsea.xlsx"))
+
+gsea_results %>%
+  as_tibble() %>%
+  arrange(desc(NES)) %>% 
+  select(ID, NES, setSize,	p.adjust,	qvalue, core_enrichment) %>%
+  knitr::kable()%>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>% 
+  scroll_box(width = "1000px", height = "500px")
+```
+
+### Reactome
+
+```{r}
+
+res_tbl = read.csv(paste0("./data_output/Combined_Day5_Ola5_vs_Day5_DMSO/res_tbl.csv"))
+    
+ordered_genes_fc = res_tbl$log2FoldChange
+names(ordered_genes_fc) = res_tbl$gene
+ordered_genes_fc = sort(ordered_genes_fc, decreasing = T)
+
+gsea_results = GSEA(
+  geneList = ordered_genes_fc, 
+  pvalueCutoff = 0.05, 
+  eps = 0, 
+  pAdjustMethod = "BH", 
+  nPermSimple = 10000,
+  TERM2GENE = dplyr::select(
+    hsa_reactome_sets,
+    gs_name,
+     gene_symbol
+  )
+)
+
+dotplot(gsea_results, x = "NES", showCategory = 20, font.size = 6)+ 
+  labs(title = "GSEA",
+          subtitle = paste0("GSEA Reactome Day 5 Ola 5 vs DMSO"))+
+  theme(axis.line = element_line(color='black'),
+  plot.background = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank())
+
+ggsave(plot = last_plot(), paste0("./figures/Combined_Day5_Ola5_vs_Day5_DMSO/Reactomegsea.svg"), dpi = 300,
+      height = 8, width = 8, device = "svg")
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola5_day5_Reactomegsea.svg"), dpi = 300,
+      height = 5, width = 4.5, device = "svg")
+
+write.xlsx(gsea_results, paste0("./data_output/Combined_Day5_Ola5_vs_Day5_DMSO/Reactomegsea.xlsx"))
+
+gsea_results %>%
+  as_tibble() %>%
+  arrange(desc(NES)) %>% 
+  select(ID, NES, setSize,	p.adjust,	qvalue, core_enrichment) %>%
+  knitr::kable()%>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>% 
+  scroll_box(width = "1000px", height = "500px")
+```
+
+### GSEA plot 
+
+```{r}
+
+# fatty acid
+
+gseaplot2(gsea_results, geneSetID = 82, title = gsea_results$Description[82])
+
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola5_day5_gseaplot_fattyacid.svg"), dpi = 300,
+      height = 2.5, width = 4, device = "svg")
+
+
+```
+
+
+### Hallmark
+
+```{r, fig.height=5, fig.width=7}
+
+gsea_results = GSEA(
+  geneList = ordered_genes_fc, 
+  pvalueCutoff = 0.05, 
+  eps = 0, 
+  pAdjustMethod = "BH", 
+  nPermSimple = 10000,
+  TERM2GENE = dplyr::select(
+    hsa_hallmark_sets,
+    gs_name,
+     gene_symbol
+  )
+)
+
+dotplot(gsea_results, x = "NES", showCategory = 20, font.size = 6)+ 
+  labs(title = "GSEA",
+          subtitle = paste0("GSEA Hallmark Day 5 Ola 5 vs DMSO"))+
+  theme(axis.line = element_line(color='black'),
+  plot.background = element_blank(),
+  panel.grid.major = element_blank(),
+  panel.grid.minor = element_blank())
+
+ggsave(plot = last_plot(), paste0("./figures/Combined_Day5_Ola1_vs_Day5_DMSO/Hallmarkgsea.svg"), dpi = 300,
+      height = 8, width = 8, device = "svg")
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola5_day5_Hallmarkgsea.svg"), dpi = 300,
+      height = 5, width = 4.5, device = "svg")
+
+write.xlsx(gsea_results, paste0("./data_output/Combined_Day5_Ola1_vs_Day5_DMSO/Hallmarkgsea.xlsx"))
+
+gsea_results %>%
+  as_tibble() %>%
+  arrange(desc(NES)) %>% 
+  select(ID, NES, setSize,	p.adjust,	qvalue, core_enrichment) %>%
+  knitr::kable()%>% 
+  kable_styling(bootstrap_options = c("striped", "hover", "condensed", "responsive")) %>% 
+  scroll_box(width = "1000px", height = "500px")
+```
+
+### GSEA plot 
+
+```{r}
+
+# hallmark emt pathway
+
+gseaplot2(gsea_results, geneSetID = 10, title = gsea_results$Description[10])
+
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Ola5_day5_gseaplot_emt.svg"), dpi = 300,
+      height = 2.5, width = 4, device = "svg")
+
+
+```
+
+### Summary
+
+```{r}
+
+hsa_summary = 
+  hsa_GOBP_sets %>% 
+  filter(gs_name %in% toupper(c("GOBP_DOUBLE_STRAND_BREAK_REPAIR", "GOBP_LIPID_CATABOLIC_PROCESS","GOBP_FATTY_ACID_METABOLIC_PROCESS","GOBP_NEGATIVE_REGULATION_OF_IMMUNE_SYSTEM_PROCESS", "GOBP_STEROL_METABOLIC_PROCESS","GOBP_RESPONSE_TO_INTERFERON_GAMMA","GOBP_MACROPHAGE_ACTIVATION","GOBP_RESPONSE_TO_INTERLEUKIN_1","GOBP_NEUTROPHIL_CHEMOTAXIS","GOBP_T_CELL_MIGRATION"))) %>% 
+  rbind(hsa_reactome_sets %>% filter(
+    gs_name%in% toupper(c("REACTOME_FATTY_ACID_METABOLISM", "REACTOME_CELL_CYCLE_CHECKPOINTS",
+                          "REACTOME_ECM_PROTEOGLYCANS", "GOBP_INTERLEUKIN_2_PRODUCTION","GOBP_REGULATION_OF_SPROUTING_ANGIOGENESIS","GOBP_FAT_SOLUBLE_VITAMIN_CATABOLIC_PROCESS","GOBP_TRANSFORMING_GROWTH_FACTOR_BETA_PRODUCTION","GOBP_REGULATION_OF_MEMBRANE_LIPID_DISTRIBUTION")))) %>% 
+  rbind(hsa_hallmark_sets %>%  filter(gs_name %in% toupper(c("hallmark_p53_pathway","HALLMARK_TNFA_SIGNALING_VIA_NFKB","HALLMARK_EPITHELIAL_MESENCHYMAL_TRANSITION", "hallmark_hypoxia","HALLMARK_UNFOLDED_PROTEIN_RESPONSE","HALLMARK_MTORC1_SIGNALING","HALLMARK_INFLAMMATORY_RESPONSE"))))
+
+# load results for each conditions
+res_tbl_ola1 = read.csv("./data_output/Combined_Day5_Ola1_vs_Day5_DMSO/res_tbl.csv")
+res_tbl_ola5 = read.csv("./data_output/Combined_Day5_Ola5_vs_Day5_DMSO/res_tbl.csv")
+
+
+ordered_genes_fc1 <- res_tbl_ola1$log2FoldChange
+names(ordered_genes_fc1) <- res_tbl_ola1$gene
+ordered_genes_fc1 <- sort(ordered_genes_fc1, decreasing = T) 
+
+ordered_genes_fc2 <- res_tbl_ola5$log2FoldChange
+names(ordered_genes_fc2) <- res_tbl_ola5$gene
+ordered_genes_fc2 <- sort(ordered_genes_fc2, decreasing = T)
+
+gcSample1 = list(Ola_1 = ordered_genes_fc1, 
+                Ola_5 = ordered_genes_fc2)
+
+# compare
+
+ck = compareCluster(gcSample1, fun = GSEA, TERM2GENE = dplyr::select(
+    hsa_summary,gs_name,gene_symbol))
+
+# plot
+
+dotplot(ck, showCategory = 20, font.size = 7, x = "NES", by = "Count")+
+ theme(strip.background = element_rect(
+     color="black", fill = 'grey95',size=.5, linetype="solid"))+
+  facet_grid(.~Cluster)+
+  scale_colour_gradient2(limits=c(0, 0.05), low="red", high = "blue", 
+                         mid = "grey", midpoint = 0.015)+
+  theme(axis.line = element_line(color='black'),
+  plot.background = element_blank())+
+  labs(title = "Day 5 GSEA",
+              subtitle = "Ola 1 and Ola 5 compared to DMSO")
+
+ggsave(plot = last_plot(), paste0("./figures/for_pub/Summary_day5_gsea.svg"), dpi = 300,
+      height = 6, width = 8, device = "svg")
+
+```
+
+# Venn diagram on steroids (UpsetPlot)
+
+Conditions we want to compare, per group:
+
+\- Ola 1 vs DMSO
+
+\- Ola 5 vs DMSO
+
+I extracted all significantly differentially expressed genes (DEGs) for
+each condition (\|log2Fc\| \>= 1 and pval \< 0.05).
+
+**Set size** = how many DEGs there are per sample
+
+**Intersection size** = How many genes are shared between the x samples
+tied together with the bar + nodes
+
+So if you sum up all the intersection size with a dot in a sample, you
+get the set size of that sample. It's essentially a venn diagram for
+when you have \>3 samples you want to compare.
+
+```{r, fig.height=7, fig.width=10}
+
+# load in the data to be formatted for an upset plot
+# keep each gene name that has a signif pval and |log2fc| > 0.5
+# use ensembl to encompass unnamed transcripts
+
+folder = c("Combined_Day1_Ola1_vs_Day1_DMSO","Combined_Day1_Ola5_vs_Day1_DMSO",
+           "Combined_Day5_Ola1_vs_Day5_DMSO","Combined_Day5_Ola5_vs_Day5_DMSO")
+
+for(i in 1:length(folder)){
+  res = read.csv(paste0("./data_output/",folder[i],"/res_tbl.csv"))
+  genes = res %>% 
+    select(ensembl, log2FoldChange, padj) %>% 
+    filter(abs(log2FoldChange)>= 0.5 & padj < 0.05) %>% 
+    select(ensembl)
+  genes$temp = 1
+  colnames(genes)[2] = folder[i]
+  assign(folder[i], genes)
+}
+
+datalist_dmso = list(Combined_Day1_Ola1_vs_Day1_DMSO,Combined_Day1_Ola5_vs_Day1_DMSO,
+           Combined_Day5_Ola1_vs_Day5_DMSO,Combined_Day5_Ola5_vs_Day5_DMSO)
+
+big_data_dmso =
+  datalist_dmso %>% purrr::reduce(full_join, by='ensembl')%>% 
+  mutate(across(where(is.numeric), ~ replace_na(.x, 0))) 
+
+```
+
+```{r, fig.height=5, fig.width=10}
+
+m1 = make_comb_mat(big_data_dmso)
+
+UpSet(m1, top_annotation = upset_top_annotation(m1, add_numbers = TRUE),
+    right_annotation = upset_right_annotation(m1, add_numbers = TRUE),
+    comb_order = order(-comb_size(m1)), 
+    comb_col = c("#ffbe4f", "#e8702a", "#6bd2db","#7e073d")[comb_degree(m1)],
+    row_names_gp = gpar(fontsize = 10))
+
+
+```
+

@@ -15,7 +15,7 @@ library(pheatmap)
 
 ## Load the raw count matrices, two in this case
 
-counts = read.table("./data/LLG001-027_Raw_Count_Data.txt", header = T)
+counts = read.table("./data/rawcountdata_LLG001-027.txt", header = T)
 
 ## Load metadata (sample annotation file)
 
